@@ -1,41 +1,41 @@
 #include "monty.h"
-/**
- * f_mod - computes the rest of the division of the second
- * top element of the stack by the top element of the stack
- * @head: stack head
- * @counter: line_number
- * Return: no return
-*/
-void f_mod(stack_t **head, unsigned int counter)
-{
-	stack_t *h;
-	int len = 0, aux;
 
-	h = *head;
-	while (h)
+/**
+ * get_opcodes - selects the correct opcode to perform
+ *
+ * @opc: opcode passed
+ *
+ * Return: pointer to the function that executes the opcode
+ */
+void (*get_opcodes(char *opc))(stack_t **stack, unsigned int line_number)
+{
+	instruction_t instruct[] = {
+		{"push", _push},
+		{"pall", _pall},
+		{"pint", _pint},
+		{"pop", _pop},
+		{"swap", _swap},
+		{"queue", _queue},
+		{"stack", _stack},
+		{"add", _add},
+		{"nop", _nop},
+		{"sub", _sub},
+		{"mul", _mul},
+		{"div", _div},
+		{"mod", _mod},
+		{"pchar", _pchar},
+		{"pstr", _pstr},
+		{"rotl", _rotl},
+		{"rotr", _rotr},
+		{NULL, NULL}
+	};
+	int i;
+
+	for (i = 0; instruct[i].opcode; i++)
 	{
-		h = h->next;
-		len++;
+		if (_strcmp(instruct[i].opcode, opc) == 0)
+			break;
 	}
-	if (len < 2)
-	{
-		fprintf(stderr, "L%d: can't mod, stack too short\n", counter);
-		fclose(bus.file);
-		free(bus.content);
-		free_stack(*head);
-		exit(EXIT_FAILURE);
-	}
-	h = *head;
-	if (h->n == 0)
-	{
-		fprintf(stderr, "L%d: division by zero\n", counter);
-		fclose(bus.file);
-		free(bus.content);
-		free_stack(*head);
-		exit(EXIT_FAILURE);
-	}
-	aux = h->next->n % h->n;
-	h->next->n = aux;
-	*head = h->next;
-	free(h);
+
+	return (instruct[i].f);
 }
